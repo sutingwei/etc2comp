@@ -23,6 +23,7 @@
 #include "Etc.h"
 
 #if USE_STB_IMAGE_LOAD
+#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #endif
 
@@ -106,7 +107,7 @@ namespace Etc
 		//if stb_iamge is available, only use it to load files other than png
 		char *fileExt = strrchr(m_pstrFilename, '.');
 
-//		if (strcmp(fileExt, ".png") != 0)
+		if (strcmp(fileExt, ".png") != 0)
 		{
 			paucPixels = stbi_load(m_pstrFilename, &iWidth, &iHeight, &iBitsPerPixel, 4);
 

@@ -123,7 +123,7 @@ public:
 // ----------------------------------------------------------------------------------------------------
 //
 /*耦合多，直接去掉文件不行，通过改main的名字保证编译通过*/
-int hide_main(int argc, const char * argv[])
+int main(int argc, const char * argv[])
 {
 
 	static const bool USE_C_INTERFACE = false;
