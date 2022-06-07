@@ -90,6 +90,7 @@ public:
 		i_vPixel = -1;
 		verboseOutput = false;
 		boolNormalizeXYZ = false;
+		boolFlipY = false;
 		mipmaps = 1;
 		mipFilterFlags = Etc::FILTER_WRAP_NONE;
 	}
@@ -114,9 +115,27 @@ public:
 	int i_hPixel;
 	int i_vPixel;
 	bool boolNormalizeXYZ;
+	bool boolFlipY;
 	int mipmaps;
 	unsigned int mipFilterFlags;
 };
+
+// Flip the image in Y
+void FlipY(SourceImage& sourceimage) {
+    const size_t rowSizeBytes = sizeof(ColorFloatRGBA) * sourceimage.GetWidth();
+    char* pacRow = new char[rowSizeBytes];
+    assert(pacRow);
+
+    for (int iY = 0; iY < sourceimage.GetHeight() / 2; ++iY) {
+        ColorFloatRGBA* row1 = sourceimage.GetPixels() + sourceimage.GetWidth() * iY;
+        ColorFloatRGBA* row2 = sourceimage.GetPixels() + sourceimage.GetWidth() * (sourceimage.GetHeight() - 1 - iY);
+        memcpy(pacRow, row1, rowSizeBytes);
+        memcpy(row1, row2, rowSizeBytes);
+        memcpy(row2, pacRow, rowSizeBytes);
+    }
+
+    delete[] pacRow;
+}
 
 #include "EtcFileHeader.h"
 
@@ -153,6 +172,11 @@ int main(int argc, const char * argv[])
 	{
 		sourceimage.NormalizeXYZ();
 	}
+
+    if (commands.boolFlipY)
+    {
+        FlipY(sourceimage);
+    }
 
 	unsigned int uiSourceWidth = sourceimage.GetWidth();
 	unsigned int uiSourceHeight = sourceimage.GetHeight();
@@ -629,6 +653,11 @@ bool Commands::ProcessCommandLineArguments(int a_iArgs, const char *a_apstrArgs[
 		{
 			boolNormalizeXYZ = true;
 		}
+        else if (strcmp(a_apstrArgs[iArg], "-flipy") == 0 ||
+                 strcmp(a_apstrArgs[iArg], "-flipY") == 0)
+        {
+            boolFlipY = true;
+        }
 		else if (strcmp(a_apstrArgs[iArg], "-output") == 0)
 		{
 			++iArg;
